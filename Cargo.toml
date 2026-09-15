@@ -1,0 +1,24 @@
+[package]
+name = "emberdb"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.89"
+description = "An LSM-tree key-value storage engine with a WAL, bloom-filtered SSTables and leveled compaction"
+license = "MIT"
+repository = "https://github.com/r5sp/emberdb"
+readme = "README.md"
+keywords = ["lsm", "database", "storage-engine", "key-value", "sstable"]
+categories = ["database-implementations", "data-structures"]
+
+[dependencies]
+crc32fast = "1.4"
+
+[dev-dependencies]
+proptest = "1.5"
+tempfile = "3.10"
+
+[profile.release]
+debug = 1
+
+[profile.bench]
+debug = 1

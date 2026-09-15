@@ -1,0 +1,17 @@
+# Build output
+/target/
+
+# Local database directories created by examples
+/data/
+*.emberdb/
+
+# Editor / OS files
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+
+# Profiling artifacts
+perf.data*
+flamegraph.svg
