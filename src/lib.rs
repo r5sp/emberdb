@@ -9,6 +9,7 @@
 
 mod coding;
 mod error;
+mod memtable;
 mod options;
 mod types;
 mod wal;
