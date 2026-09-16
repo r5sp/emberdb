@@ -8,6 +8,7 @@
 #![warn(missing_docs)]
 
 mod coding;
+mod compaction;
 mod error;
 mod iterator;
 mod manifest;
