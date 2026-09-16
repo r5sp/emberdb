@@ -142,7 +142,10 @@ mod tests {
         let rejected = (0..10_000)
             .filter(|i| !table.may_contain(format!("absent{i}").as_bytes()))
             .count();
-        assert!(rejected > 9_700, "only {rejected} of 10000 absent keys filtered");
+        assert!(
+            rejected > 9_700,
+            "only {rejected} of 10000 absent keys filtered"
+        );
     }
 
     #[test]
@@ -184,14 +187,20 @@ mod tests {
         bytes[10] ^= 0x01;
         std::fs::write(&path, &bytes).unwrap();
         let table = Table::open(&path).unwrap();
-        assert!(matches!(table.get(&data[0].0), Err(crate::Error::Corruption(_))));
+        assert!(matches!(
+            table.get(&data[0].0),
+            Err(crate::Error::Corruption(_))
+        ));
 
         // Damaged magic or footer: open must fail.
         for at in [pristine.len() - 1, pristine.len() - FOOTER_LEN + 3] {
             let mut bytes = pristine.clone();
             bytes[at] ^= 0x01;
             std::fs::write(&path, &bytes).unwrap();
-            assert!(matches!(Table::open(&path), Err(crate::Error::Corruption(_))));
+            assert!(matches!(
+                Table::open(&path),
+                Err(crate::Error::Corruption(_))
+            ));
         }
 
         // Truncated file.
