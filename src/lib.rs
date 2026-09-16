@@ -11,6 +11,7 @@ mod coding;
 mod error;
 mod memtable;
 mod options;
+mod sstable;
 mod types;
 mod wal;
 
