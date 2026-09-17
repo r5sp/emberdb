@@ -12,8 +12,8 @@ mod bloom;
 mod builder;
 mod table;
 
-pub use builder::{TableBuilder, TableInfo};
-pub use table::{Table, TableIter};
+pub use builder::TableBuilder;
+pub use table::Table;
 
 /// Magic bytes at the end of every SSTable.
 pub const TABLE_MAGIC: &[u8; 8] = b"EMBERDB1";
@@ -52,6 +52,7 @@ impl BlockHandle {
 
 #[cfg(test)]
 mod tests {
+    use super::builder::TableInfo;
     use super::*;
     use crate::options::Options;
     use crate::types::{Entry, Value};
@@ -98,7 +99,6 @@ mod tests {
         assert_eq!(info.largest, data.last().unwrap().0);
 
         let table = Table::open(&path).unwrap();
-        assert_eq!(table.num_entries(), 2_000);
         assert_eq!(table.file_size(), info.file_size);
         for (k, v) in &data {
             assert_eq!(table.get(k).unwrap().as_ref(), Some(v));

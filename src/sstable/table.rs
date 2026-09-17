@@ -18,7 +18,6 @@ pub struct Table {
     file: File,
     index: Arc<Block>,
     filter: BloomFilter,
-    num_entries: u64,
     file_size: u64,
 }
 
@@ -58,7 +57,6 @@ impl Table {
             offset: read_u64_le(&footer, 16),
             len: read_u64_le(&footer, 24),
         };
-        let num_entries = read_u64_le(&footer, 32);
 
         let index = Arc::new(Block::new(read_block(&file, file_size, index_handle)?)?);
         let filter = BloomFilter::new(read_block(&file, file_size, filter_handle)?);
@@ -66,15 +64,11 @@ impl Table {
             file,
             index,
             filter,
-            num_entries,
             file_size,
         })
     }
 
-    pub fn num_entries(&self) -> u64 {
-        self.num_entries
-    }
-
+    #[cfg(test)]
     pub fn file_size(&self) -> u64 {
         self.file_size
     }
@@ -111,6 +105,7 @@ impl Table {
     }
 
     /// Returns `false` if the bloom filter proves `key` is absent.
+    #[cfg(test)]
     pub fn may_contain(&self, key: &[u8]) -> bool {
         self.filter.may_contain(key)
     }

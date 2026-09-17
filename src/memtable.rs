@@ -42,6 +42,7 @@ impl Memtable {
         self.map.get(key)
     }
 
+    #[cfg(test)]
     pub fn len(&self) -> usize {
         self.map.len()
     }
