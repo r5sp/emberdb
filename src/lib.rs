@@ -11,6 +11,7 @@ mod coding;
 mod error;
 mod options;
 mod types;
+mod wal;
 
 pub use error::{Error, Result};
 pub use options::Options;
