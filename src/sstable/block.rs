@@ -143,7 +143,9 @@ impl Block {
         let tag = d.u8()?;
         let value_len = d.varint_usize()?;
         if shared > prev_key.len() {
-            return Err(Error::corruption("block entry shares more than previous key"));
+            return Err(Error::corruption(
+                "block entry shares more than previous key",
+            ));
         }
         let suffix = d.slice(unshared)?;
         let value = d.slice(value_len)?;
@@ -308,7 +310,7 @@ mod tests {
         assert!(Block::new(vec![1, 2]).is_err());
         assert!(Block::new(vec![0, 0, 0, 0]).is_err()); // zero restarts
         assert!(Block::new(vec![9, 0, 0, 0]).is_err()); // restart array overflows
-        // Valid framing, garbage entry: iteration must error, not panic.
+                                                        // Valid framing, garbage entry: iteration must error, not panic.
         let mut data = vec![0xff, 0xff, 0xff];
         data.extend_from_slice(&0u32.to_le_bytes());
         data.extend_from_slice(&1u32.to_le_bytes());

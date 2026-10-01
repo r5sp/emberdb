@@ -82,7 +82,9 @@ impl<'a> Decoder<'a> {
 
     pub fn u64_le(&mut self) -> Result<u64> {
         let bytes = self.slice(8)?;
-        Ok(u64::from_le_bytes(bytes.try_into().expect("slice of len 8")))
+        Ok(u64::from_le_bytes(
+            bytes.try_into().expect("slice of len 8"),
+        ))
     }
 
     pub fn slice(&mut self, len: usize) -> Result<&'a [u8]> {
@@ -116,7 +118,17 @@ mod tests {
 
     #[test]
     fn varint_roundtrip() {
-        let values = [0u64, 1, 127, 128, 300, 16_383, 16_384, u32::MAX as u64, u64::MAX];
+        let values = [
+            0u64,
+            1,
+            127,
+            128,
+            300,
+            16_383,
+            16_384,
+            u32::MAX as u64,
+            u64::MAX,
+        ];
         for &v in &values {
             let mut buf = Vec::new();
             put_varint(&mut buf, v);

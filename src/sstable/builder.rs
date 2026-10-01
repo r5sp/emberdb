@@ -91,7 +91,8 @@ impl TableBuilder {
             len: contents.len() as u64,
         };
         self.out.write_all(contents)?;
-        self.out.write_all(&crc32fast::hash(contents).to_le_bytes())?;
+        self.out
+            .write_all(&crc32fast::hash(contents).to_le_bytes())?;
         self.offset += contents.len() as u64 + 4;
         Ok(handle)
     }
@@ -105,14 +106,17 @@ impl TableBuilder {
         let handle = self.write_block(&contents)?;
         // The index maps each block's last key to its location: the first index entry
         // whose key is >= a lookup key identifies the only block that may contain it.
-        self.index_block.add(&last_key, &Value::Put(handle.encode()));
+        self.index_block
+            .add(&last_key, &Value::Put(handle.encode()));
         Ok(())
     }
 
     /// Writes the filter, index and footer and fsyncs the file.
     pub fn finish(mut self) -> Result<TableInfo> {
         if self.num_entries == 0 {
-            return Err(Error::InvalidArgument("cannot finish an empty table".into()));
+            return Err(Error::InvalidArgument(
+                "cannot finish an empty table".into(),
+            ));
         }
         self.flush_data_block()?;
         let largest = self.index_block.last_key().to_vec();

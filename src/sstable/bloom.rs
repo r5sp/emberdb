@@ -72,7 +72,8 @@ impl BloomFilter {
             return true;
         }
         let nbits = (nbytes * 8) as u64;
-        probes(hash64(key), k, nbits).all(|pos| self.data[(pos / 8) as usize] & (1 << (pos % 8)) != 0)
+        probes(hash64(key), k, nbits)
+            .all(|pos| self.data[(pos / 8) as usize] & (1 << (pos % 8)) != 0)
     }
 }
 
@@ -101,7 +102,9 @@ pub fn hash64(data: &[u8]) -> u64 {
     if !rem.is_empty() {
         let mut buf = [0u8; 8];
         buf[..rem.len()].copy_from_slice(rem);
-        h = (h ^ mix(u64::from_le_bytes(buf))).rotate_left(27).wrapping_mul(P);
+        h = (h ^ mix(u64::from_le_bytes(buf)))
+            .rotate_left(27)
+            .wrapping_mul(P);
     }
     mix(h)
 }
@@ -128,14 +131,19 @@ mod tests {
 
     #[test]
     fn no_false_negatives() {
-        let keys: Vec<Vec<u8>> = (0..10_000).map(|i| format!("key-{i}").into_bytes()).collect();
+        let keys: Vec<Vec<u8>> = (0..10_000)
+            .map(|i| format!("key-{i}").into_bytes())
+            .collect();
         let f = build(keys.iter().cloned(), 10);
         assert!(keys.iter().all(|k| f.may_contain(k)));
     }
 
     fn false_positive_rate(bits_per_key: usize) -> f64 {
         let n = 10_000;
-        let f = build((0..n).map(|i| format!("present-{i}").into_bytes()), bits_per_key);
+        let f = build(
+            (0..n).map(|i| format!("present-{i}").into_bytes()),
+            bits_per_key,
+        );
         let trials = 100_000;
         let hits = (0..trials)
             .filter(|i| f.may_contain(format!("absent-{i}").as_bytes()))

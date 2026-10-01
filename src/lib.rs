@@ -9,10 +9,13 @@
 
 mod coding;
 mod error;
+mod iterator;
+mod manifest;
 mod memtable;
 mod options;
 mod sstable;
 mod types;
+mod version;
 mod wal;
 
 pub use error::{Error, Result};
