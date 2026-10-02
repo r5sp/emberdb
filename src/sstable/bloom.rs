@@ -95,7 +95,9 @@ pub fn hash64(data: &[u8]) -> u64 {
     let mut h: u64 = 0xcbf2_9ce4_8422_2325 ^ (data.len() as u64).wrapping_mul(P);
     let (chunks, rem) = data.as_chunks::<8>();
     for c in chunks {
-        h = (h ^ mix(u64::from_le_bytes(*c))).rotate_left(27).wrapping_mul(P);
+        h = (h ^ mix(u64::from_le_bytes(*c)))
+            .rotate_left(27)
+            .wrapping_mul(P);
     }
     if !rem.is_empty() {
         let mut buf = [0u8; 8];
