@@ -93,12 +93,10 @@ fn probes(h: u64, k: u32, nbits: u64) -> impl Iterator<Item = u64> {
 pub fn hash64(data: &[u8]) -> u64 {
     const P: u64 = 0x9E37_79B9_7F4A_7C15;
     let mut h: u64 = 0xcbf2_9ce4_8422_2325 ^ (data.len() as u64).wrapping_mul(P);
-    let mut chunks = data.chunks_exact(8);
-    for c in &mut chunks {
-        let w = u64::from_le_bytes(c.try_into().expect("chunk of 8"));
-        h = (h ^ mix(w)).rotate_left(27).wrapping_mul(P);
+    let (chunks, rem) = data.as_chunks::<8>();
+    for c in chunks {
+        h = (h ^ mix(u64::from_le_bytes(*c))).rotate_left(27).wrapping_mul(P);
     }
-    let rem = chunks.remainder();
     if !rem.is_empty() {
         let mut buf = [0u8; 8];
         buf[..rem.len()].copy_from_slice(rem);

@@ -80,13 +80,6 @@ impl<'a> Decoder<'a> {
         Ok(b)
     }
 
-    pub fn u64_le(&mut self) -> Result<u64> {
-        let bytes = self.slice(8)?;
-        Ok(u64::from_le_bytes(
-            bytes.try_into().expect("slice of len 8"),
-        ))
-    }
-
     pub fn slice(&mut self, len: usize) -> Result<&'a [u8]> {
         let end = self
             .pos

@@ -9,6 +9,7 @@
 
 mod coding;
 mod compaction;
+mod db;
 mod error;
 mod iterator;
 mod manifest;
@@ -19,5 +20,6 @@ mod types;
 mod version;
 mod wal;
 
+pub use db::{Db, DbIterator, LevelStats, Stats};
 pub use error::{Error, Result};
 pub use options::Options;

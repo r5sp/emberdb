@@ -76,10 +76,6 @@ impl TableBuilder {
         }
     }
 
-    pub fn num_entries(&self) -> u64 {
-        self.num_entries
-    }
-
     /// Approximate size of the file if it were finished now.
     pub fn estimated_size(&self) -> u64 {
         self.offset + self.data_block.estimated_size() as u64

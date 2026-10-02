@@ -132,7 +132,7 @@ impl Version {
         for (level, h) in added {
             levels[level].push(h);
         }
-        levels[0].sort_by(|a, b| b.meta.number.cmp(&a.meta.number));
+        levels[0].sort_by_key(|t| std::cmp::Reverse(t.meta.number));
         for level in &mut levels[1..] {
             level.sort_by(|a, b| a.meta.smallest.cmp(&b.meta.smallest));
             debug_assert!(
