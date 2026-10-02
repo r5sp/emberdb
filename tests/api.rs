@@ -286,7 +286,10 @@ fn concurrent_readers_and_writers_with_background_compaction() {
 
     db.wait_for_compactions().unwrap();
     let stats = db.stats();
-    assert!(stats.levels[0].files < 2, "L0 drained below its trigger: {stats}");
+    assert!(
+        stats.levels[0].files < 2,
+        "L0 drained below its trigger: {stats}"
+    );
     drop(db);
 
     // Reopen after background work was interrupted by the drop.
