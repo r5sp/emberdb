@@ -283,6 +283,10 @@ fn concurrent_readers_and_writers_with_background_compaction() {
         }
     }
     assert_eq!(db.iter().unwrap().count(), 8_000);
+
+    db.wait_for_compactions().unwrap();
+    let stats = db.stats();
+    assert!(stats.levels[0].files < 2, "L0 drained below its trigger: {stats}");
     drop(db);
 
     // Reopen after background work was interrupted by the drop.
