@@ -56,6 +56,8 @@ struct Worker {
 
 enum Msg {
     Work,
+    /// Run any pending work, then signal the sender.
+    Barrier(Sender<()>),
     Shutdown,
 }
 
@@ -404,6 +406,20 @@ impl Db {
         }
     }
 
+    /// Blocks until the background thread has flushed any immutable memtable and brought
+    /// every level within its size budget. Useful for benchmarks and tests that want a
+    /// quiescent tree. Returns immediately when background compaction is disabled, since
+    /// that work then happens inline.
+    pub fn wait_for_compactions(&self) -> Result<()> {
+        if let Some(w) = &self.worker {
+            let (tx, rx) = mpsc::channel();
+            if w.tx.send(Msg::Barrier(tx)).is_ok() {
+                let _ = rx.recv();
+            }
+        }
+        self.inner.check_bg_error()
+    }
+
     /// The database directory.
     pub fn path(&self) -> &Path {
         &self.inner.dir
@@ -436,17 +452,25 @@ impl Drop for Db {
 }
 
 fn worker_loop(inner: Arc<Inner>, rx: Receiver<Msg>) {
-    while let Ok(msg) = rx.recv() {
-        let mut shutdown = matches!(msg, Msg::Shutdown);
+    while let Ok(first) = rx.recv() {
         // Coalesce queued requests: one pass handles all pending work.
-        while let Ok(msg) = rx.try_recv() {
-            shutdown |= matches!(msg, Msg::Shutdown);
+        let mut shutdown = false;
+        let mut barriers = Vec::new();
+        for msg in std::iter::once(first).chain(rx.try_iter()) {
+            match msg {
+                Msg::Work => {}
+                Msg::Barrier(ack) => barriers.push(ack),
+                Msg::Shutdown => shutdown = true,
+            }
         }
         if shutdown {
             return;
         }
         if let Err(e) = inner.background_work() {
             inner.set_bg_error(&e);
+        }
+        for ack in barriers {
+            let _ = ack.send(());
         }
     }
 }
