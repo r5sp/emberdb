@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/r5sp/emberdb/actions/workflows/ci.yml/badge.svg)](https://github.com/r5sp/emberdb/actions/workflows/ci.yml)
 
-An LSM-tree key-value store in Rust, written from scratch. WAL, memtable, SSTables with
+An LSM-tree key-value store in Rust, written from scratch. WAL, skiplist memtable, SSTables with
 bloom filters, leveled compaction, and a manifest that gets swapped atomically.
 Only runtime dep is `crc32fast`, everything else lives in this crate.
 
@@ -38,6 +38,11 @@ L2    one sorted run, 160 MiB
 
 get: memtable -> immutable -> L0 newest first -> one table per level
 ```
+
+The memtable is my own skiplist (p = 1/4, max height 12). Nodes sit in one `Vec` and
+link by index instead of pointers, so it's all safe Rust and a flushed memtable frees in
+one deallocation. It only needs one writer because writes already hold the `Db` lock.
+A unit test checks it against a `BTreeMap` over 20,000 random inserts and 500 range reads.
 
 Memtable hits `memtable_size` (4 MiB default), it gets frozen and the background thread
 flushes it. If a second one fills before the first is flushed, the writer stalls and
